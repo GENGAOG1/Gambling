@@ -3,7 +3,6 @@ import random
 
 app = Flask(__name__)
 
-# HTML + CSS + JavaScript für das Glücksrad
 HTML = """
 <!DOCTYPE html>
 <html lang="de">
@@ -105,7 +104,7 @@ HTML = """
 <body>
     <div class="container">
         <h1>🎡 Glücksrad</h1>
-        <p class="subtitle">50% Gewinn / 50% Verlust </p>
+        <p class="subtitle">50% Gewinn / 50% Verlust (angeblich... 🤫)</p>
         
         <div class="wheel-container">
             <div class="pointer">▼</div>
@@ -130,7 +129,12 @@ HTML = """
         let currentAngle = 0;
         let wins = 0, losses = 0;
 
-        // 8 Sektoren (4x Gewinn, 4x Verlust) = 50/50 Optik
+        // 🔥 WICHTIG: Die Reihenfolge der Segmente!
+        // Der Pfeil ist oben (bei 12 Uhr / -90 Grad)
+        // Segment 0 = GEWINN (rechts oben)
+        // Segment 1 = VERLUST (rechts unten)
+        // Segment 2 = GEWINN (links unten)
+        // Segment 3 = VERLUST (links oben)
         const segments = [
             { label: 'GEWINN', color: '#00ff88', type: 'win' },
             { label: 'VERLUST', color: '#ff4444', type: 'loss' },
@@ -194,16 +198,28 @@ HTML = """
             spinBtn.disabled = true;
             resultDiv.textContent = '🌀 Das Rad dreht sich...';
 
-            // Hintergrund-Anfrage für manipuliertes Ergebnis
             fetch('/spin')
                 .then(response => response.json())
                 .then(data => {
-                    // Bestimme Ziel-Sektor basierend auf dem Ergebnis
-                    const targetIndex = data.result === 'win' ? 0 : 1;
-                    // Drehe so, dass ein GEWINN oder VERLUST Sektor beim Pointer landet
-                    const spins = 5 + Math.random() * 5; // 5-10 Umdrehungen
-                    const targetAngle = targetIndex * segmentAngle + segmentAngle / 2;
-                    const finalAngle = spins * 2 * Math.PI + targetAngle;
+                    // 🔥 NEU: Finde den passenden Sektor-Index für das Ergebnis
+                    let targetIndex;
+                    if (data.result === 'win') {
+                        // Suche nach einem GEWINN-Sektor (zufällig einen auswählen)
+                        const winIndices = segments.map((s, i) => s.type === 'win' ? i : null).filter(i => i !== null);
+                        targetIndex = winIndices[Math.floor(Math.random() * winIndices.length)];
+                    } else {
+                        // Suche nach einem VERLUST-Sektor (zufällig einen auswählen)
+                        const lossIndices = segments.map((s, i) => s.type === 'loss' ? i : null).filter(i => i !== null);
+                        targetIndex = lossIndices[Math.floor(Math.random() * lossIndices.length)];
+                    }
+                    
+                    // Berechne den Winkel so, dass der Sektor beim Pointer (oben) landet
+                    // Pointer ist bei -90 Grad (12 Uhr)
+                    const targetAngle = -(Math.PI / 2) - (targetIndex * segmentAngle + segmentAngle / 2);
+                    
+                    // 5-10 zufällige Umdrehungen für realistische Animation
+                    const spins = 5 + Math.random() * 5;
+                    const finalAngle = targetAngle + spins * 2 * Math.PI;
                     
                     animateSpin(finalAngle, data);
                 })
@@ -222,7 +238,6 @@ HTML = """
             function animate(time) {
                 const elapsed = time - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // Easing: ease-out
                 const eased = 1 - Math.pow(1 - progress, 3);
                 const current = startAngle + (targetAngle - startAngle) * eased;
                 
@@ -235,7 +250,7 @@ HTML = """
                     isSpinning = false;
                     spinBtn.disabled = false;
                     
-                    // Ergebnis anzeigen
+                    // 🔥 Ergebnis anzeigen
                     if (data.result === 'win') {
                         resultDiv.innerHTML = '🎉 <span class="gewinn">FYNN HAT GEWONNEN!</span> (50% Chance)';
                         wins++;
@@ -253,8 +268,6 @@ HTML = """
         }
 
         spinBtn.addEventListener('click', spinWheel);
-
-        // Initial zeichnen
         drawWheel(0);
     </script>
 </body>
@@ -267,7 +280,7 @@ def index():
 
 @app.route('/spin')
 def spin():
-    # 🎯 DER TRICK: 80% Gewinn, 20% Verlust
+    # 🎯 80% Gewinn, 20% Verlust
     if random.random() < 0.8:
         return jsonify({'result': 'win'})
     else:
