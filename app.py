@@ -132,14 +132,14 @@ HTML = """
 
         // 8 Sektoren (4x Gewinn, 4x Verlust) = 50/50 Optik
         const segments = [
-            { label: 'GEWINN', color: '#00ff88', type: 'win' },
-            { label: 'VERLUST', color: '#ff4444', type: 'loss' },
-            { label: 'GEWINN', color: '#00cc77', type: 'win' },
-            { label: 'VERLUST', color: '#cc3333', type: 'loss' },
-            { label: 'GEWINN', color: '#00ff88', type: 'win' },
-            { label: 'VERLUST', color: '#ff4444', type: 'loss' },
-            { label: 'GEWINN', color: '#00cc77', type: 'win' },
-            { label: 'VERLUST', color: '#cc3333', type: 'loss' }
+            { label: 'FYNN GEWINNT', color: '#00ff88', type: 'win' },
+            { label: 'FYNN VERLIERT', color: '#ff4444', type: 'loss' },
+            { label: 'FYNN GEWINNT', color: '#00cc77', type: 'win' },
+            { label: 'FYNN VERLIERT', color: '#cc3333', type: 'loss' },
+            { label: 'FYNN GWEINNT', color: '#00ff88', type: 'win' },
+            { label: 'FYNN VERLIERT', color: '#ff4444', type: 'loss' },
+            { label: 'FYNN GEWINNT', color: '#00cc77', type: 'win' },
+            { label: 'FYNN VERLIERT', color: '#cc3333', type: 'loss' }
         ];
 
         const segmentAngle = (2 * Math.PI) / segments.length;
@@ -237,10 +237,10 @@ HTML = """
                     
                     // Ergebnis anzeigen
                     if (data.result === 'win') {
-                        resultDiv.innerHTML = '🎉 <span class="gewinn">FYNN HAT GEWONNEN!</span> (50% Chance)';
+                        resultDiv.innerHTML = '🎉 <span class="gewinn">FYNN HAT VERLOREN!</span> (50% Chance)';
                         wins++;
                     } else {
-                        resultDiv.innerHTML = '😢 <span class="verlust">FYNN HAT VERLOREN!</span> (50% Chance)';
+                        resultDiv.innerHTML = '😢 <span class="verlust">FYNN HAT GEWONNEN!</span> (50% Chance)';
                         losses++;
                     }
                     document.getElementById('wins').textContent = wins;
