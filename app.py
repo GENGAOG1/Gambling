@@ -10,7 +10,7 @@ HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎡 Korruptes Glücksrad</title>
+    <title>🎡 Glücksrad</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -104,8 +104,8 @@ HTML = """
 </head>
 <body>
     <div class="container">
-        <h1>🎡 Korruptes Glücksrad</h1>
-        <p class="subtitle">50% Gewinn / 50% Verlust (angeblich... 🤫)</p>
+        <h1>🎡 Glücksrad</h1>
+        <p class="subtitle">50% Gewinn / 50% Verlust </p>
         
         <div class="wheel-container">
             <div class="pointer">▼</div>
@@ -237,10 +237,10 @@ HTML = """
                     
                     // Ergebnis anzeigen
                     if (data.result === 'win') {
-                        resultDiv.innerHTML = '🎉 <span class="gewinn">GEWONNEN!</span> (80% Chance)';
+                        resultDiv.innerHTML = '🎉 <span class="gewinn">GEWONNEN!</span> (50% Chance)';
                         wins++;
                     } else {
-                        resultDiv.innerHTML = '😢 <span class="verlust">VERLOREN!</span> (20% Chance)';
+                        resultDiv.innerHTML = '😢 <span class="verlust">VERLOREN!</span> (50% Chance)';
                         losses++;
                     }
                     document.getElementById('wins').textContent = wins;
