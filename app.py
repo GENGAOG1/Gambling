@@ -129,12 +129,7 @@ HTML = """
         let currentAngle = 0;
         let wins = 0, losses = 0;
 
-        // 🔥 WICHTIG: Die Reihenfolge der Segmente!
-        // Der Pfeil ist oben (bei 12 Uhr / -90 Grad)
-        // Segment 0 = GEWINN (rechts oben)
-        // Segment 1 = VERLUST (rechts unten)
-        // Segment 2 = GEWINN (links unten)
-        // Segment 3 = VERLUST (links oben)
+        // 🔥 8 Segmente: 4x GEWINN, 4x VERLUST
         const segments = [
             { label: 'GEWINN', color: '#00ff88', type: 'win' },
             { label: 'VERLUST', color: '#ff4444', type: 'loss' },
@@ -168,7 +163,6 @@ HTML = """
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Text
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + segmentAngle / 2);
@@ -182,7 +176,6 @@ HTML = """
                 ctx.restore();
             });
 
-            // Mittelpunkt
             ctx.beginPath();
             ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
             ctx.fillStyle = '#ffd700';
@@ -201,27 +194,30 @@ HTML = """
             fetch('/spin')
                 .then(response => response.json())
                 .then(data => {
-                    // 🔥 NEU: Finde den passenden Sektor-Index für das Ergebnis
+                    // 🔥 Wähle passenden Sektor
                     let targetIndex;
+                    const winIndices = segments.map((s, i) => s.type === 'win' ? i : null).filter(i => i !== null);
+                    const lossIndices = segments.map((s, i) => s.type === 'loss' ? i : null).filter(i => i !== null);
+                    
                     if (data.result === 'win') {
-                        // Suche nach einem GEWINN-Sektor (zufällig einen auswählen)
-                        const winIndices = segments.map((s, i) => s.type === 'win' ? i : null).filter(i => i !== null);
                         targetIndex = winIndices[Math.floor(Math.random() * winIndices.length)];
                     } else {
-                        // Suche nach einem VERLUST-Sektor (zufällig einen auswählen)
-                        const lossIndices = segments.map((s, i) => s.type === 'loss' ? i : null).filter(i => i !== null);
                         targetIndex = lossIndices[Math.floor(Math.random() * lossIndices.length)];
                     }
                     
-                    // Berechne den Winkel so, dass der Sektor beim Pointer (oben) landet
-                    // Pointer ist bei -90 Grad (12 Uhr)
-                    const targetAngle = -(Math.PI / 2) - (targetIndex * segmentAngle + segmentAngle / 2);
+                    // 🔥 KORREKTE Winkelberechnung für Pointer (oben = -PI/2)
+                    // Der Mittelpunkt des Sektors soll beim Pointer landen
+                    const segmentCenter = targetIndex * segmentAngle + segmentAngle / 2;
+                    // Wir drehen das Rad so, dass segmentCenter bei -PI/2 (oben) liegt
+                    // Also: rotation + segmentCenter = -PI/2
+                    // => rotation = -PI/2 - segmentCenter
+                    let targetRotation = -Math.PI / 2 - segmentCenter;
                     
-                    // 5-10 zufällige Umdrehungen für realistische Animation
-                    const spins = 5 + Math.random() * 5;
-                    const finalAngle = targetAngle + spins * 2 * Math.PI;
+                    // 5-10 volle Umdrehungen für Animation
+                    const extraSpins = 5 + Math.random() * 5;
+                    targetRotation += extraSpins * 2 * Math.PI;
                     
-                    animateSpin(finalAngle, data);
+                    animateSpin(targetRotation, data);
                 })
                 .catch(err => {
                     console.error(err);
@@ -250,7 +246,6 @@ HTML = """
                     isSpinning = false;
                     spinBtn.disabled = false;
                     
-                    // 🔥 Ergebnis anzeigen
                     if (data.result === 'win') {
                         resultDiv.innerHTML = '🎉 <span class="gewinn">FYNN HAT GEWONNEN!</span> (50% Chance)';
                         wins++;
@@ -280,7 +275,7 @@ def index():
 
 @app.route('/spin')
 def spin():
-    # 🎯 80% Gewinn, 20% Verlust
+    # 80% Gewinn, 20% Verlust
     if random.random() < 0.8:
         return jsonify({'result': 'win'})
     else:
