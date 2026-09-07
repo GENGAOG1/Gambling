@@ -9,7 +9,7 @@ HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎡 Glücksrad</title>
+    <title>🎡 Korruptes Glücksrad</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -103,7 +103,7 @@ HTML = """
 </head>
 <body>
     <div class="container">
-        <h1>🎡 Glücksrad</h1>
+        <h1>🎡 Korruptes Glücksrad</h1>
         <p class="subtitle">50% Gewinn / 50% Verlust (angeblich... 🤫)</p>
         
         <div class="wheel-container">
@@ -150,7 +150,8 @@ HTML = """
             const radius = 190;
 
             segments.forEach((seg, i) => {
-                const startAngle = i * segmentAngle + rotation;
+                // 🔥 WICHTIG: Start bei -PI/2 (oben), nicht bei 0 (rechts)
+                const startAngle = -Math.PI / 2 + i * segmentAngle + rotation;
                 const endAngle = startAngle + segmentAngle;
                 
                 ctx.beginPath();
@@ -194,7 +195,7 @@ HTML = """
             fetch('/spin')
                 .then(response => response.json())
                 .then(data => {
-                    // 🔥 Wähle passenden Sektor
+                    // Wähle passenden Sektor
                     let targetIndex;
                     const winIndices = segments.map((s, i) => s.type === 'win' ? i : null).filter(i => i !== null);
                     const lossIndices = segments.map((s, i) => s.type === 'loss' ? i : null).filter(i => i !== null);
@@ -205,15 +206,14 @@ HTML = """
                         targetIndex = lossIndices[Math.floor(Math.random() * lossIndices.length)];
                     }
                     
-                    // 🔥 KORREKTE Winkelberechnung für Pointer (oben = -PI/2)
-                    // Der Mittelpunkt des Sektors soll beim Pointer landen
-                    const segmentCenter = targetIndex * segmentAngle + segmentAngle / 2;
-                    // Wir drehen das Rad so, dass segmentCenter bei -PI/2 (oben) liegt
-                    // Also: rotation + segmentCenter = -PI/2
-                    // => rotation = -PI/2 - segmentCenter
-                    let targetRotation = -Math.PI / 2 - segmentCenter;
+                    // 🔥 KORREKT: Zielrotation berechnen
+                    // Segment i beginnt bei -PI/2 + i * segmentAngle
+                    // Wir wollen, dass die Mitte des Sektors bei -PI/2 (Pointer) liegt
+                    // Also: -PI/2 + targetIndex * segmentAngle + segmentAngle/2 + rotation = -PI/2
+                    // => rotation = -targetIndex * segmentAngle - segmentAngle/2
+                    let targetRotation = -(targetIndex * segmentAngle + segmentAngle / 2);
                     
-                    // 5-10 volle Umdrehungen für Animation
+                    // 5-10 volle Umdrehungen
                     const extraSpins = 5 + Math.random() * 5;
                     targetRotation += extraSpins * 2 * Math.PI;
                     
@@ -247,10 +247,10 @@ HTML = """
                     spinBtn.disabled = false;
                     
                     if (data.result === 'win') {
-                        resultDiv.innerHTML = '🎉 <span class="gewinn">FYNN HAT GEWONNEN!</span> (50% Chance)';
+                        resultDiv.innerHTML = '🎉 <span class="gewinn">FYNN HAT GEWONNEN!</span> (80% Chance)';
                         wins++;
                     } else {
-                        resultDiv.innerHTML = '😢 <span class="verlust">FYNN HAT VERLOREN!</span> (50% Chance)';
+                        resultDiv.innerHTML = '😢 <span class="verlust">FYNN HAT VERLOREN!</span> (20% Chance)';
                         losses++;
                     }
                     document.getElementById('wins').textContent = wins;
