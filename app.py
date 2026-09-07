@@ -237,10 +237,10 @@ HTML = """
                     
                     // Ergebnis anzeigen
                     if (data.result === 'win') {
-                        resultDiv.innerHTML = '🎉 <span class="gewinn">GEWONNEN!</span> (50% Chance)';
+                        resultDiv.innerHTML = '🎉 <span class="gewinn">FYNN HAT GEWONNEN!</span> (50% Chance)';
                         wins++;
                     } else {
-                        resultDiv.innerHTML = '😢 <span class="verlust">VERLOREN!</span> (50% Chance)';
+                        resultDiv.innerHTML = '😢 <span class="verlust">FYNN HAT VERLOREN!</span> (50% Chance)';
                         losses++;
                     }
                     document.getElementById('wins').textContent = wins;
